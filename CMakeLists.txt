@@ -22,7 +22,10 @@ include_directories(${OPENGL_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${GLFW_INCLUDE_D
 #add the executable and the specifies the source files
 add_executable(${PROJECT_NAME} src/main.cpp
                                src/Shader.cpp
-                               src/ErrorHandling.cpp)
+                               src/ErrorHandling.cpp
+                               src/Vao.cpp
+                               src/Vbo.cpp
+                               src/Ebo.cpp)
 
 #links the executable with all the necessary libraries
 target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)

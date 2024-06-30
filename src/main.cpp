@@ -2,6 +2,10 @@
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 #include "Shader.h"
+#include "Vao.h"
+#include "Vbo.h"
+#include "Ebo.h"
+
 
 // Constants for window dimensions
 constexpr int WIDTH = 800;
@@ -28,11 +32,12 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 // }
 
 const float g_vertices[] = {
-     // position          // colors
-     0.0f,  0.5f, 0.0f,   1.0f,0.0f,0.0f, // top vertex (red)
-    -0.5f, -0.5f, 0.0f,   0.0f,1.0f,0.0f, // bottom left vertex (green)
-     0.5f, -0.5f, 0.0f,   0.0f,0.0f,1.0f // bottom right vertex (blue)
+    // positions         // colors
+     0.0f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f, // top vertex (red)
+    -0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f, // bottom left vertex (green)
+     0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f  // bottom right vertex (blue)
 };
+
 
 unsigned int g_indices[] = {
     0,1,2
@@ -74,13 +79,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    std::cout << "GLEW initialized successfully\n";
 
-    // Print OpenGL information
-    std::cout << "OpenGL version: " << glGetString(GL_VERSION) << "\n";
-    std::cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << "\n";
-    std::cout << "Vendor: " << glGetString(GL_VENDOR) << "\n";
-    std::cout << "Renderer: " << glGetString(GL_RENDERER) << "\n";
 
     // Set the viewport size
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -89,32 +88,46 @@ int main(int argc, char** argv)
     // Build and compile our shade Program
     Shader shader{SHADER_PATH "/vertex_shader.glsl",SHADER_PATH "/fragment_shader.glsl"};
     
+    Vao vao;
+    vao.bind();
+    Vbo vbo(g_vertices,sizeof(g_vertices));
+    
+    Ebo ebo(g_indices,sizeof(g_indices));
+
+
     // Set up vertex data and buffers and configure vertex atttributes
-    unsigned int vbo,vao,ebo;
-    glGenVertexArrays(1,&vao);
-    glGenBuffers(1,&vbo);
-    glGenBuffers(1,&ebo);
+    //unsigned int ebo; // identifiers of the buffers
+    //glGenBuffers(1,&vbo); // 1 Object inside context to store data, this is for vertex data
+    //glGenBuffers(1,&ebo); // index data
 
-    glBindVertexArray(vao);
 
-    glBindBuffer(GL_ARRAY_BUFFER,vbo);
-    glBufferData(GL_ARRAY_BUFFER,sizeof(g_vertices), g_vertices ,GL_STATIC_DRAW);
+    // Targets are different types of buffer, can be array buffer for attributes like pos,col or elements array ...
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(g_indices), g_indices ,GL_STATIC_DRAW);
+    //glBindBuffer(GL_ARRAY_BUFFER,vbo); // target to which object is bound (vertex attributes),
+    //glBufferData(GL_ARRAY_BUFFER,sizeof(g_vertices), g_vertices ,GL_STATIC_DRAW); // malloc type allocation in GPU
+    
+
+
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ebo);
+    // GL_STATIC_DRAW it is a hit to the gpu how to optimize performance
+    //glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(g_indices), g_indices ,GL_STATIC_DRAW);
 
 
     //Position attributes
-    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,6*sizeof(float),(void*)0);
-    glEnableVertexAttribArray(0);
+    // glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,6*sizeof(float),(void*)(0 * sizeof(float)));// location is 0, xyz numebr os positions, gl_float,normzalize no,
+    // byteofsset between consecutive vertex attributes, offest of the first component
+    // glEnableVertexAttribArray(0);
+    vao.setAttribute(0,3,GL_FLOAT,GL_FALSE,6*sizeof(float),(void*)(0 * sizeof(float)));
 
     // Color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))); // location iss 1,rgb, skips the 3 float are the posiotn 
+    //glEnableVertexAttribArray(1);
+
+    vao.setAttribute(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+
 
     // Unbind the VAO
-    glBindVertexArray(0);
-
+    vao.unbind();
     
 
     // Main loop
@@ -124,11 +137,12 @@ int main(int argc, char** argv)
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        //Use the shader progra,
+        //Use the shader program
+        shader.use();
 
         // Render the triangle
         // Bind the VAO (it encapsulates the vertex attribute configuration)
-        glBindVertexArray(vao);
+        vao.bind();
 
         // Draw the triangle using the EBO (index buffer)
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
@@ -146,11 +160,8 @@ int main(int argc, char** argv)
         glfwPollEvents();
     }
 
-
-    // Clean up
-    glDeleteVertexArrays(1,&vao);
-    glDeleteBuffers(1,&vbo);
-    glDeleteBuffers(1,&ebo);
+    //glDeleteBuffers(1,&vbo);
+    //glDeleteBuffers(1,&ebo);
 
     // Clean up and exit
     glfwDestroyWindow(window);

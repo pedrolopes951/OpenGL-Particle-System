@@ -27,8 +27,9 @@ void ErrorHandling::checkCompilationError(GLuint shader, ErrorTypeShader type)
             std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << "PROGRAM" << "\n"
                       << std::string(infoLog.begin(),infoLog.end()) << "\n -- --------------------------------------------------- -- " << std::endl;
         }
+        break;
     default:
-        std::cerr << "ERROR: NOT VALID TYPE FOR SHADER COMPILATIOS" << "\n";
+        std::cerr << "ERROR: NOT VALID TYPE FOR SHADER COMPILATION" << "\n";
         break;
     }
 }
