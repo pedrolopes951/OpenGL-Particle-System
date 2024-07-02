@@ -17,7 +17,13 @@ add_compile_definitions(SHADER_PATH="${CMAKE_SOURCE_DIR}/shaders")
 
 
 # Includes directories for OpenGL, GLEW and GLFW
-include_directories(${OPENGL_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/include)
+include_directories(${OPENGL_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/utils)
+
+add_library(Utils STATIC 
+            ${CMAKE_SOURCE_DIR}/utils/Config.cpp
+            ${CMAKE_SOURCE_DIR}/utils/Logger.cpp
+            ${CMAKE_SOURCE_DIR}/utils/Utils.cpp
+)
 
 #add the executable and the specifies the source files
 add_executable(${PROJECT_NAME} src/main.cpp
@@ -25,7 +31,9 @@ add_executable(${PROJECT_NAME} src/main.cpp
                                src/ErrorHandling.cpp
                                src/Vao.cpp
                                src/Vbo.cpp
-                               src/Ebo.cpp)
+                               src/Ebo.cpp
+                               src/ShaderManager.cpp
+                               src/EventManager.cpp)
 
 #links the executable with all the necessary libraries
-target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
+target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw Utils)

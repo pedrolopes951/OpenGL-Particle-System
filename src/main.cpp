@@ -18,19 +18,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-// Function to render a triangle
-// void draw_triangle()
-// {
-//     glBegin(GL_TRIANGLES); // Begin drawing triangles
-//         glColor3f(1.0f, 0.0f, 0.0f); // Red color
-//         glVertex2f(-0.5f, -0.5f);    // Vertex 1
-//         glColor3f(0.0f, 1.0f, 0.0f); // Green color
-//         glVertex2f(0.5f, -0.5f);     // Vertex 2
-//         glColor3f(0.0f, 0.0f, 1.0f); // Blue color
-//         glVertex2f(0.0f, 0.5f);      // Vertex 3
-//     glEnd(); // End drawing triangles
-// }
-
 const float g_vertices[] = {
     // positions         // colors
      0.0f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f, // top vertex (red)
@@ -94,34 +81,8 @@ int main(int argc, char** argv)
     
     Ebo ebo(g_indices,sizeof(g_indices));
 
-
-    // Set up vertex data and buffers and configure vertex atttributes
-    //unsigned int ebo; // identifiers of the buffers
-    //glGenBuffers(1,&vbo); // 1 Object inside context to store data, this is for vertex data
-    //glGenBuffers(1,&ebo); // index data
-
-
-    // Targets are different types of buffer, can be array buffer for attributes like pos,col or elements array ...
-
-    //glBindBuffer(GL_ARRAY_BUFFER,vbo); // target to which object is bound (vertex attributes),
-    //glBufferData(GL_ARRAY_BUFFER,sizeof(g_vertices), g_vertices ,GL_STATIC_DRAW); // malloc type allocation in GPU
-    
-
-
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ebo);
-    // GL_STATIC_DRAW it is a hit to the gpu how to optimize performance
-    //glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(g_indices), g_indices ,GL_STATIC_DRAW);
-
-
-    //Position attributes
-    // glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,6*sizeof(float),(void*)(0 * sizeof(float)));// location is 0, xyz numebr os positions, gl_float,normzalize no,
-    // byteofsset between consecutive vertex attributes, offest of the first component
-    // glEnableVertexAttribArray(0);
     vao.setAttribute(0,3,GL_FLOAT,GL_FALSE,6*sizeof(float),(void*)(0 * sizeof(float)));
 
-    // Color attribute
-    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))); // location iss 1,rgb, skips the 3 float are the posiotn 
-    //glEnableVertexAttribArray(1);
 
     vao.setAttribute(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 
@@ -159,9 +120,6 @@ int main(int argc, char** argv)
         // Poll for and process events
         glfwPollEvents();
     }
-
-    //glDeleteBuffers(1,&vbo);
-    //glDeleteBuffers(1,&ebo);
 
     // Clean up and exit
     glfwDestroyWindow(window);
