@@ -1,19 +1,17 @@
 #pragma once
 #include <GL/glew.h>
 #include <string>
+#include <unordered_map>
 
 class Shader
 {
 private:
     /* data */
     // Program ID
-    GLuint m_programID;
+    GLuint m_programID{};
 
-    // Vertex Shader in str
-    std::string m_vertexShader;
-
-    // Fragment Shader in str
-    std::string m_fragmentShader;
+    // Store the shaders of the shader/
+    std::unordered_map<GLenum,std::string> m_shaderSources; 
     
 
     // Compile the shader
@@ -26,9 +24,17 @@ private:
 
 public:
     Shader(const std::string& vertexShaderPath,const std::string& fragmentShaderPath);
+    Shader(const std::unordered_map<GLenum, std::string>& shaderPaths);
+
 
     // Use the shader
     void use() const;
+
+    GLuint getProgramID()const {return m_programID;}
+
+
+
+    
 
 
     ~Shader();

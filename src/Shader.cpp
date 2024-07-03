@@ -3,11 +3,23 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <vector>
 
-Shader::Shader(const std::string &vertexShaderPath, const std::string &fragmentShaderPath) : m_vertexShader{Shader::loadShaderSource(vertexShaderPath)}, m_fragmentShader{Shader::loadShaderSource(fragmentShaderPath)}
+Shader::Shader(const std::string &vertexShaderPath, const std::string &fragmentShaderPath) 
 {
+    m_shaderSources[GL_VERTEX_SHADER] = Shader::loadShaderSource(vertexShaderPath); 
+    m_shaderSources[GL_FRAGMENT_SHADER] = Shader::loadShaderSource(fragmentShaderPath);
 
     // Compilation of shaders
+    this->compile();
+}
+
+Shader::Shader(const std::unordered_map<GLenum, std::string> &shaderPaths) : m_shaderSources{shaderPaths}
+{
+    for (auto& [type,path]: m_shaderSources)
+    {
+        m_shaderSources[type] = Shader::loadShaderSource(path);
+    }
     this->compile();
 }
 
@@ -43,27 +55,30 @@ std::string Shader::loadShaderSource(const std::string &filePathShader)
 void Shader::compile()
 {
 
-    const char *vertexShader = m_vertexShader.c_str();
-    const char *fragmentShader = m_fragmentShader.c_str();
+    std::vector<GLuint> shaderIDs;
 
-    // Shaders
-    GLuint vertex, fragment;
+    for (const auto&[type,source]: m_shaderSources)
+    {
+        const char *shaderCode = source.c_str();
 
-    vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 1, &vertexShader, NULL);
-    glCompileShader(vertex);
-    ErrorHandling::checkCompilationError(vertex,ErrorTypeShader::SHADER);
+        GLuint shader = glCreateShader(type);
+        glShaderSource(shader, 1, &shaderCode, NULL);
+        glCompileShader(shader);
+        ErrorHandling::checkCompilationError(shader,ErrorTypeShader::SHADER);
+        shaderIDs.push_back(shader);
 
-    fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 1, &fragmentShader, NULL);
-    glCompileShader(fragment);
-    ErrorHandling::checkCompilationError(fragment,ErrorTypeShader::SHADER);
+    }
+    
+
 
     // Shader Program
     m_programID = glCreateProgram();
 
-    glAttachShader(m_programID,vertex);
-    glAttachShader(m_programID,fragment);
+    for (const auto& shaderID : shaderIDs)
+    {
+        glAttachShader(m_programID,shaderID);
+    }
+    
 
     glLinkProgram(m_programID);
 
@@ -71,8 +86,11 @@ void Shader::compile()
 
     // Delete the shaders as they're linked into out program, and we can free up memory 
 
-    glDeleteShader(vertex);
-    glDeleteShader(fragment);
+    for (const auto& shaderID : shaderIDs)
+    {
+        glDeleteShader(shaderID);
+    }
+    
 
 
 }
