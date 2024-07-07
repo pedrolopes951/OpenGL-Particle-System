@@ -73,7 +73,7 @@ int main(int argc, char** argv)
     glViewport(0, 0, WIDTH, HEIGHT);
 
     // Build and compile our shade Program
-    //Shader shader{SHADER_PATH "/vertex_shader.glsl",SHADER_PATH "/fragment_shader.glsl"};
+    Shader shader{SHADER_PATH "/vertex_shader.glsl",SHADER_PATH "/fragment_shader.glsl"};
     std::unordered_map<GLenum, std::string> basid_shaders = {{GL_VERTEX_SHADER,SHADER_PATH "/vertex_shader.glsl"},{GL_FRAGMENT_SHADER,SHADER_PATH "/fragment_shader.glsl"}};
     
 
