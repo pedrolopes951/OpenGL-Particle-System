@@ -23,8 +23,14 @@ private:
     static std::string loadShaderSource(const std::string& filePathShader);
 
 public:
+    Shader(){}
     Shader(const std::string& vertexShaderPath,const std::string& fragmentShaderPath);
     Shader(const std::unordered_map<GLenum, std::string>& shaderPaths);
+
+    // Delete cpy construcotr and copy assignment
+
+    Shader(const Shader&) = delete;
+    Shader& operator=(const Shader&) = delete;
 
 
     // Use the shader

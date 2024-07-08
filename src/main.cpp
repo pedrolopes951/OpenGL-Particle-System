@@ -5,6 +5,7 @@
 #include "Vao.h"
 #include "Vbo.h"
 #include "Ebo.h"
+#include "ShaderManager.h"
 
 
 // Constants for window dimensions
@@ -29,6 +30,20 @@ const float g_vertices[] = {
 unsigned int g_indices[] = {
     0,1,2
 };
+
+static ShaderManager& initShaderManager()
+{
+    ShaderManager& shaderManager = ShaderManager::getInstance();
+
+    std::unordered_map<GLenum, std::string> basic_shaders = {
+        {GL_VERTEX_SHADER, SHADER_PATH "/vertex_shader.glsl"},
+        {GL_FRAGMENT_SHADER, SHADER_PATH "/fragment_shader.glsl"}
+    };
+
+    shaderManager.loadShader("basicShaders", basic_shaders);
+
+    return shaderManager;
+}
 
 
 int main(int argc, char** argv)
@@ -73,21 +88,21 @@ int main(int argc, char** argv)
     glViewport(0, 0, WIDTH, HEIGHT);
 
     // Build and compile our shade Program
-    Shader shader{SHADER_PATH "/vertex_shader.glsl",SHADER_PATH "/fragment_shader.glsl"};
-    std::unordered_map<GLenum, std::string> basid_shaders = {{GL_VERTEX_SHADER,SHADER_PATH "/vertex_shader.glsl"},{GL_FRAGMENT_SHADER,SHADER_PATH "/fragment_shader.glsl"}};
+    Shader basicShader1{SHADER_PATH "/vertex_shader.glsl",SHADER_PATH "/fragment_shader.glsl"};
     
+    // Init Shader Manager
+    ShaderManager& shaderManager = initShaderManager();
 
+
+    auto basicShader2 = shaderManager.getShader("basicShaders");
+    
     Vao vao;
     vao.bind();
-    Vbo vbo(g_vertices,sizeof(g_vertices));
-    
-    Ebo ebo(g_indices,sizeof(g_indices));
+    Vbo vbo(g_vertices, sizeof(g_vertices));
+    Ebo ebo(g_indices, sizeof(g_indices));
 
-    vao.setAttribute(0,3,GL_FLOAT,GL_FALSE,6*sizeof(float),(void*)(0 * sizeof(float)));
-
-
+    vao.setAttribute(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(0 * sizeof(float)));
     vao.setAttribute(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-
 
     // Unbind the VAO
     vao.unbind();
@@ -101,7 +116,8 @@ int main(int argc, char** argv)
         glClear(GL_COLOR_BUFFER_BIT);
 
         //Use the shader program
-        shader.use();
+        //basicShader1.use();
+        basicShader2->use();
 
         // Render the triangle
         // Bind the VAO (it encapsulates the vertex attribute configuration)

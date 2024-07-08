@@ -55,43 +55,35 @@ std::string Shader::loadShaderSource(const std::string &filePathShader)
 void Shader::compile()
 {
 
-    std::vector<GLuint> shaderIDs;
+     std::vector<GLuint> shaderIDs;
 
-    for (const auto&[type,source]: m_shaderSources)
+    for (const auto& [type, source] : m_shaderSources)
     {
         const char *shaderCode = source.c_str();
-
         GLuint shader = glCreateShader(type);
         glShaderSource(shader, 1, &shaderCode, NULL);
         glCompileShader(shader);
-        ErrorHandling::checkCompilationError(shader,ErrorTypeShader::SHADER);
+        ErrorHandling::checkCompilationError(shader, ErrorTypeShader::SHADER);
         shaderIDs.push_back(shader);
-
     }
-    
-
 
     // Shader Program
     m_programID = glCreateProgram();
 
     for (const auto& shaderID : shaderIDs)
     {
-        glAttachShader(m_programID,shaderID);
+        glAttachShader(m_programID, shaderID);
     }
-    
 
     glLinkProgram(m_programID);
 
-    ErrorHandling::checkCompilationError(m_programID,ErrorTypeShader::PROGRAM);
+    ErrorHandling::checkCompilationError(m_programID, ErrorTypeShader::PROGRAM);
 
-    // Delete the shaders as they're linked into out program, and we can free up memory 
-
+    // Delete the shaders as they're linked into our program, and we can free up memory
     for (const auto& shaderID : shaderIDs)
     {
         glDeleteShader(shaderID);
     }
-    
-
 
 }
 
